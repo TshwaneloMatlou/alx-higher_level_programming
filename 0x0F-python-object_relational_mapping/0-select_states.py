@@ -8,8 +8,7 @@ import sys
 
 def retrieve_all_states(username, password, dbname):
     # Connect to MySQL server
-    conn = MySQLdb.connect(host='localhost', port=3306,
-                           user=username, passwd=password, db=dbname)
+    conn = MySQLdb.connect(host='localhost', port=3306, user=username, passwd=password, db=dbname)
 
     # Create a cursor object to execute SQL queries
     cursor = conn.cursor()
