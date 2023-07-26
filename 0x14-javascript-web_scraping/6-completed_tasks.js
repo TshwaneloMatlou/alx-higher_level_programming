@@ -1,37 +1,26 @@
 #!/usr/bin/node
-
+/* A script that computes the number of tasks completed by user id. */
 const request = require('request');
+const url = process.argv[2];
 
-function countCompletedTasks(apiUrl) {
-  request(apiUrl, (error, response, body) => {
-    if (error) {
-      console.error('Error:', error);
-    } else if (response.statusCode !== 200) {
-      console.error('Status:', response.statusCode);
-    } else {
-      const todos = JSON.parse(body);
-      const completedTasksByUserId = {};
-
-      todos.forEach((todo) => {
-        if (todo.completed) {
-          if (completedTasksByUserId[todo.userId]) {
-            completedTasksByUserId[todo.userId]++;
-          } else {
-            completedTasksByUserId[todo.userId] = 1;
-          }
+request(url, function (err, response, body) {
+  if (err) {
+    console.log(err);
+  } else if (response.statusCode === 200) {
+    const completed = {};
+    const tasks = JSON.parse(body);
+    for (const i in tasks) {
+      const task = tasks[i];
+      if (task.completed === true) {
+        if (completed[task.userId] === undefined) {
+          completed[task.userId] = 1;
+        } else {
+          completed[task.userId]++;
         }
-      });
-
-      console.log(completedTasksByUserId);
+      }
     }
-  });
-}
-
-const apiUrl = process.argv[2];
-
-if (!apiUrl) {
-  console.error('Usage: ./6-completed_tasks.js <API_URL>');
-  process.exit(1);
-}
-
-countCompletedTasks(apiUrl);
+    console.log(completed);
+  } else {
+    console.log('An error occured. Status code: ' + response.statusCode);
+  }
+});
