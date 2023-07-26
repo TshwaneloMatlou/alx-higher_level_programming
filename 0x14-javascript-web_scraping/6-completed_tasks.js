@@ -1,28 +1,37 @@
 #!/usr/bin/node
 
 const request = require('request');
-const url = process.argv[2];
 
-request(url, (err, response, body) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  const todos = JSON.parse(body);
-  const uniqueUserIds = new Set();
-  todos.forEach(entry => {
-    uniqueUserIds.add(entry.userId);
-  });
+function countCompletedTasks(apiUrl) {
+  request(apiUrl, (error, response, body) => {
+    if (error) {
+      console.error('Error:', error);
+    } else if (response.statusCode !== 200) {
+      console.error('Status:', response.statusCode);
+    } else {
+      const todos = JSON.parse(body);
+      const completedTasksByUserId = {};
 
-  const completed = {};
-  for (const i of uniqueUserIds) {
-    let n = 0;
-    for (const dos of todos) {
-      if (dos.userId === i && dos.completed) {
-        n++;
-      }
+      todos.forEach((todo) => {
+        if (todo.completed) {
+          if (completedTasksByUserId[todo.userId]) {
+            completedTasksByUserId[todo.userId]++;
+          } else {
+            completedTasksByUserId[todo.userId] = 1;
+          }
+        }
+      });
+
+      console.log(completedTasksByUserId);
     }
-    completed[i] = n;
-  }
-  console.log(completed);
-});
+  });
+}
+
+const apiUrl = process.argv[2];
+
+if (!apiUrl) {
+  console.error('Usage: ./6-completed_tasks.js <API_URL>');
+  process.exit(1);
+}
+
+countCompletedTasks(apiUrl);
