@@ -1,25 +1,32 @@
 #!/usr/bin/node
-// prints the number of movies where the character Wedge Antilles is present
-
-const args = process.argv;
-let reqURL = args[2];
-let request = require('request');
-request(reqURL, function (error, response, body) {
+/**
+  prints number of movies where the character 'Wedge Antilles' is present.
+  usage: ./4-starwars_count.js <API URL>
+  */
+const myArgs = process.argv.slice(2);
+const request = require('request');
+const characters_ = [];
+request(myArgs[0], function (error, response, body) {
   if (error) {
-    console.log('error:', error); // Print the error if one occurred
-  } else {
-    let jso = JSON.parse(body);
-    let results = jso['results'];
-    let count = 0;
-    for (let i = 0; i < results.length; i++) {
-      let chars = (results[i]['characters']);
-      for (let j = 0; j < chars.length; j++) {
-        let check18 = chars[j].endsWith('18/');
-        if (check18) {
-          count++;
-        }
+    console.log(error);
+  }
+  if (!error) {
+    let i = 0;
+    const json_ = JSON.parse(body);
+
+    for (i = 0; i < 7; i++) {
+      characters_.push(json_.results[i].characters);
+    }
+  }
+  let counter = 0;
+  characters_.forEach(function each (item) {
+    if (Array.isArray(item)) {
+      item.forEach(each);
+    } else {
+      if (item === 'https://swapi-api.hbtn.io/api/people/18/') {
+        counter++;
       }
     }
-    console.log(count);
-  }
+  });
+  console.log(counter);
 });
